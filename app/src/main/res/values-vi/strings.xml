@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Nối thú cổ điển</string>
+    <string name="next_level">Bấm "Tiếp tục" để sang màn tiếp theo</string>
+    <string name="you_win">THẮNG CUỘC</string>
+    <string name="game_over">THUA CUỘC</string>
+    <string name="time_up">Hết thời gian!</string>
+    <string name="play_again">Chơi lại</string>
+    <string name="continue_game">Tiếp tục</string>
+    <string name="quit">Thoát</string>
+    <string name="OK">Ok</string>
+    <string name="no_shuffle_left">Bạn không còn lượt đổi nào! Cẩn thận vì bạn có thể thua!</string>
+    <string name="no_hint_left">Bạn không còn lượt trợ giúp nào!</string>
+    <string name="no_more_moves">Không thể xáo trộn game do hết lượt đổi!</string>
+</resources>

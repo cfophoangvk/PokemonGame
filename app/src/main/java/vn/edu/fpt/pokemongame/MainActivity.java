@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -85,18 +84,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //sort the file names LEXICOGRAPHICALLY (1,2,3...)
-        Collections.sort(piecesFiles, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                Matcher m1 = pattern.matcher(o1);
-                Matcher m2 = pattern.matcher(o2);
-                if (m1.matches() && m2.matches()) {
-                    int n1 = Integer.parseInt(m1.group(1)); // m1.group is the number after "pieces"
-                    int n2 = Integer.parseInt(m2.group(1)); // m2.group is the number after "pieces"
-                    return n1 - n2; //sort by these two numbers.
-                }
-                return o1.compareTo(o2); //in case it doesn't have number, sort it by alphabetically by default.
+        piecesFiles.sort((o1, o2) -> {
+            Matcher m1 = pattern.matcher(o1);
+            Matcher m2 = pattern.matcher(o2);
+            if (m1.matches() && m2.matches()) {
+                int n1 = Integer.parseInt(m1.group(1)); // m1.group is the number after "pieces"
+                int n2 = Integer.parseInt(m2.group(1)); // m2.group is the number after "pieces"
+                return n1 - n2; //sort by these two numbers.
             }
+            return o1.compareTo(o2); //in case it doesn't have number, sort it by alphabetically by default.
         });
 
         //load and store image files into bitmap array
@@ -121,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 shuffleRemaining--;
                 tvShuffleRemaining.setText(shuffleRemaining + "");
             } else {
-                Toast.makeText(MainActivity.this, "You have no shuffle left! You are in risk of game over!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.no_shuffle_left), Toast.LENGTH_SHORT).show();
             }
         });
         hintBtn.setOnClickListener(v -> {
@@ -130,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 hintRemaining--;
                 tvHintRemaining.setText(hintRemaining + "");
             } else {
-                Toast.makeText(MainActivity.this, "You have no hint left!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.no_hint_left), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -149,16 +145,16 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 progressBar.setProgress(0);
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Game over")
-                        .setMessage("Time up. Play again?")
-                        .setPositiveButton("OK", (di, which) -> {
+                        .setTitle(getString(R.string.game_over))
+                        .setMessage(getString(R.string.time_up))
+                        .setPositiveButton(getString(R.string.play_again), (di, which) -> {
                             Intent intent = new Intent(MainActivity.this, getClass());
                             intent.putExtra("hint", hintRemaining);
                             intent.putExtra("shuffle", ++shuffleRemaining);
                             finish();
                             startActivity(intent);
                         })
-                        .setNegativeButton("Quit", (di, which) -> {
+                        .setNegativeButton(getString(R.string.quit), (di, which) -> {
                             finish();
                         })
                         .show();
@@ -275,57 +271,60 @@ public class MainActivity extends AppCompatActivity {
             //after the line + highlight cards are rendered, waits for 0.1 seconds and then remove the highlighted color + the draw line from the 2 selected cards.
             card.postDelayed(() -> {
                 if (pairingImageView != null) pairingImageView.setForeground(null);
-                if (card != null) card.setForeground(null);
+                card.setForeground(null);
                 drawLine(null, null, null);
+                pairingImageView = null;
 
                 if (canConnect) {
-                    pairingImageView.setVisibility(View.INVISIBLE);
-                    card.setVisibility(View.INVISIBLE);
-
+                    //sync images to board after board matrix is changed
+                    synchronizeBoard();
                     //check if all board are empty -> you win
                     if (GameManager.checkEmptyBoard()) {
                         countDownTimer.cancel();
-                        AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("You win!")
-                                .setMessage("Do you want to continue?")
-                                .setPositiveButton("OK", (di, which) -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(getString(R.string.you_win))
+                                .setMessage(getString(R.string.next_level))
+                                .setPositiveButton(getString(R.string.continue_game), (di, which) -> {
                                     Intent intent = new Intent(this, getClass());
                                     intent.putExtra("hint", hintRemaining);
                                     intent.putExtra("shuffle", ++shuffleRemaining);
                                     finish();
                                     startActivity(intent);
                                 })
-                                .setNegativeButton("Quit", (di, which) -> {
+                                .setNegativeButton(getString(R.string.quit), (di, which) -> {
                                     finish();
                                 });
                         builder.setCancelable(false);
                         builder.show();
                     } else {
                         if (GameManager.validPairs.isEmpty()) {
+                            //if shuffle is remaining
                             if (shuffleRemaining > 0) {
                                 shuffleBtn.performClick();
                             } else {
                                 //if no more moves + no shuffle -> you lose
                                 countDownTimer.cancel();
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle("Game over!")
-                                        .setMessage("No more moves. Play again?")
-                                        .setPositiveButton("OK", (di, which) -> {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                                        .setTitle(getString(R.string.game_over))
+                                        .setMessage(getString(R.string.no_more_moves))
+                                        .setPositiveButton(getString(R.string.play_again), (di, which) -> {
                                             Intent intent = new Intent(this, getClass());
                                             intent.putExtra("hint", 3);
                                             intent.putExtra("shuffle", 3);
                                             finish();
                                             startActivity(intent);
                                         })
-                                        .setNegativeButton("Quit", (di, which) -> {
+                                        .setNegativeButton(getString(R.string.quit), (di, which) -> {
                                             finish();
-                                        })
-                                        .show();
+                                        });
+                                builder.setCancelable(false);
+                                builder.show();
                             }
-                        } else populateCardsAgain(false); //make sure there is always a valid move
+                        } else {
+                            populateCardsAgain(false); //make sure there is always a valid move
+                        }
                     }
                 }
-                pairingImageView = null;
             }, 100);
         }
     }
@@ -390,6 +389,22 @@ public class MainActivity extends AppCompatActivity {
                     card.setForeground(null);
                 }
             }, step * 400);
+        }
+    }
+
+    //synchronize board matrix with images
+    void synchronizeBoard() {
+        for (int i = 0; i < GameManager.BOARD.length; i++) {
+            for (int j = 0; j < GameManager.BOARD[0].length; j++) {
+                int cardIndex = i * WIDTH + j;
+                ImageView card = (ImageView) gameBoard.getChildAt(cardIndex);
+                if (GameManager.BOARD[i][j] == 0) {
+                    card.setVisibility(View.INVISIBLE);
+                } else {
+                    card.setVisibility(View.VISIBLE);
+                    card.setImageBitmap(images[GameManager.BOARD[i][j] - 1]);
+                }
+            }
         }
     }
 }

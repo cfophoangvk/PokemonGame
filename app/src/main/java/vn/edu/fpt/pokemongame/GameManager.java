@@ -10,7 +10,8 @@ import java.util.TreeMap;
 
 public class GameManager {
     public static int[][] BOARD;
-    public static int TILES = 36;
+    public static final int TILES = 36;
+    public static int level = 1;
     public static ArrayList<Integer> cards = new ArrayList<>();
     private static TreeMap<Integer, ArrayList<Point>> points = new TreeMap<>();
     public static HashMap<PointPair, PointPair> validPairs = new HashMap<>();
@@ -55,11 +56,11 @@ public class GameManager {
     public static void addPointsToGroup() {
         points.clear();
         for (int i = 0; i < BOARD.length; i++) {
-            for (int j = 0; j < BOARD[i].length; j++) {
+            for (int j = 0; j < BOARD[0].length; j++) {
                 if (BOARD[i][j] != 0) {
                     Point p = new Point(j, i);
                     if (!points.containsKey(BOARD[i][j])) {
-                        points.put(BOARD[i][j], new ArrayList<Point>());
+                        points.put(BOARD[i][j], new ArrayList<>());
                     }
                     points.get(BOARD[i][j]).add(p);
                 }
@@ -94,6 +95,9 @@ public class GameManager {
         }
         BOARD[p1.y][p1.x] = 0;
         BOARD[p2.y][p2.x] = 0;
+
+        transformBoard(p1, p2);
+        addPointsToGroup();
         addValidMoves();
     }
 
@@ -115,10 +119,7 @@ public class GameManager {
 
         PointPair pp = new PointPair(p1, p2);
         //check if the points are connectable
-        if (!validPairs.containsKey(pp)) {
-            return false;
-        }
-        return true;
+        return validPairs.containsKey(pp);
     }
 
     private static void checkValidMove(Point p1, Point p2) {
@@ -335,6 +336,44 @@ public class GameManager {
         return null;
     }
 
-    //TODO: Create multiple levels
-    //TODO: Make a transform matrix to change the board's structure after deleting each pair of cards.
+    private static void transformBoard(Point p1, Point p2) {
+        switch (level) {
+            case 2: {
+                Point pMinY = p1;
+                Point pMaxY = p2;
+                if (p1.y > p2.y) {
+                    pMinY = p2;
+                    pMaxY = p1;
+                }
+                for (int i = pMaxY.y; i < BOARD.length - 1; i++) {
+                    BOARD[i][pMaxY.x] = BOARD[i + 1][pMaxY.x];
+                }
+                BOARD[BOARD.length - 1][pMaxY.x] = 0;
+                for (int i = pMinY.y; i < BOARD.length - 1; i++) {
+                    BOARD[i][pMinY.x] = BOARD[i + 1][pMinY.x];
+                }
+                BOARD[BOARD.length - 1][pMinY.x] = 0;
+                break;
+            }
+            case 3: {
+                Point pMinY = p1;
+                Point pMaxY = p2;
+                if (p1.y > p2.y) {
+                    pMinY = p2;
+                    pMaxY = p1;
+                }
+                for (int i = pMinY.y; i > 0; i--) {
+                    BOARD[i][pMinY.x] = BOARD[i - 1][pMinY.x];
+                }
+                BOARD[0][pMinY.x] = 0;
+                for (int i = pMaxY.y; i > 0; i--) {
+                    BOARD[i][pMaxY.x] = BOARD[i - 1][pMaxY.x];
+                }
+                BOARD[0][pMaxY.x] = 0;
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }

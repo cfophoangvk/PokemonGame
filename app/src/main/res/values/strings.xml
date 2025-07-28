@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">PokemonGame</string>
+    <string name="app_name">Onet Connect Animal</string>
+    <string name="next_level">Click "Continue" to go to the next level</string>
+    <string name="you_win">You win!</string>
+    <string name="game_over">Game over!</string>
+    <string name="time_up">Time up.</string>
+    <string name="play_again">Play again</string>
+    <string name="continue_game">Continue</string>
+    <string name="quit">Quit</string>
+    <string name="OK">OK</string>
+    <string name="no_shuffle_left">You have no shuffle left! You are in risk of game over!</string>
+    <string name="no_hint_left">You have no hint left!</string>
+    <string name="no_more_moves">Out of shuffles!</string>
 </resources>
