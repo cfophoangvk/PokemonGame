@@ -345,12 +345,12 @@ public class GameManager {
                     pMinY = p2;
                     pMaxY = p1;
                 }
-                for (int i = pMaxY.y; i < BOARD.length - 1; i++) {
-                    BOARD[i][pMaxY.x] = BOARD[i + 1][pMaxY.x];
+                for (int y = pMaxY.y; y < BOARD.length - 1; y++) {
+                    BOARD[y][pMaxY.x] = BOARD[y + 1][pMaxY.x];
                 }
                 BOARD[BOARD.length - 1][pMaxY.x] = 0;
-                for (int i = pMinY.y; i < BOARD.length - 1; i++) {
-                    BOARD[i][pMinY.x] = BOARD[i + 1][pMinY.x];
+                for (int y = pMinY.y; y < BOARD.length - 1; y++) {
+                    BOARD[y][pMinY.x] = BOARD[y + 1][pMinY.x];
                 }
                 BOARD[BOARD.length - 1][pMinY.x] = 0;
                 break;
@@ -362,15 +362,117 @@ public class GameManager {
                     pMinY = p2;
                     pMaxY = p1;
                 }
-                for (int i = pMinY.y; i > 0; i--) {
-                    BOARD[i][pMinY.x] = BOARD[i - 1][pMinY.x];
+                for (int y = pMinY.y; y > 0; y--) {
+                    BOARD[y][pMinY.x] = BOARD[y - 1][pMinY.x];
                 }
                 BOARD[0][pMinY.x] = 0;
-                for (int i = pMaxY.y; i > 0; i--) {
-                    BOARD[i][pMaxY.x] = BOARD[i - 1][pMaxY.x];
+                for (int y = pMaxY.y; y > 0; y--) {
+                    BOARD[y][pMaxY.x] = BOARD[y - 1][pMaxY.x];
                 }
                 BOARD[0][pMaxY.x] = 0;
                 break;
+            }
+            case 4: {
+                Point pMinX = p1;
+                Point pMaxX = p2;
+                if (p1.x > p2.x) {
+                    pMinX = p2;
+                    pMaxX = p1;
+                }
+                for (int x = pMaxX.x; x < BOARD[0].length - 1; x++) {
+                    BOARD[pMaxX.y][x] = BOARD[pMaxX.y][x + 1];
+                }
+                BOARD[pMaxX.y][BOARD[0].length - 1] = 0;
+                for (int x = pMinX.x; x < BOARD[0].length - 1; x++) {
+                    BOARD[pMinX.y][x] = BOARD[pMinX.y][x + 1];
+                }
+                BOARD[pMinX.y][BOARD[0].length - 1] = 0;
+                break;
+            }
+            case 5: {
+                Point pMinX = p1;
+                Point pMaxX = p2;
+                if (p1.x > p2.x) {
+                    pMinX = p2;
+                    pMaxX = p1;
+                }
+                for (int x = pMinX.x; x > 0; x--) {
+                    BOARD[pMinX.y][x] = BOARD[pMinX.y][x - 1];
+                }
+                BOARD[pMinX.y][0] = 0;
+                for (int x = pMaxX.x; x > 0; x--) {
+                    BOARD[pMaxX.y][x] = BOARD[pMaxX.y][x - 1];
+                }
+                BOARD[pMaxX.y][0] = 0;
+                break;
+            }
+            case 6: {
+                Point pBefore = p1;
+                Point pAfter = p2;
+
+                int middleX = BOARD[0].length / 2;
+                int distancep1 = Math.abs(p1.x - middleX);
+                int distancep2 = Math.abs(p2.x - middleX);
+                if (distancep2 < distancep1) {
+                    pBefore = p2;
+                    pAfter = p1;
+                }
+                if (pBefore.x < BOARD[0].length / 2) {
+                    for (int x = pBefore.x; x < BOARD[0].length / 2 - 1; x++) {
+                        BOARD[pBefore.y][x] = BOARD[pBefore.y][x + 1];
+                    }
+                    BOARD[pBefore.y][BOARD[0].length / 2 - 1] = 0;
+                } else {
+                    for (int x = pBefore.x; x > BOARD[0].length / 2; x--) {
+                        BOARD[pBefore.y][x] = BOARD[pBefore.y][x - 1];
+                    }
+                    BOARD[pBefore.y][BOARD[0].length / 2] = 0;
+                }
+                if (pAfter.x < BOARD[0].length / 2) {
+                    for (int x = pAfter.x; x < BOARD[0].length / 2; x++) {
+                        BOARD[pAfter.y][x] = BOARD[pAfter.y][x + 1];
+                    }
+                    BOARD[pAfter.y][BOARD[0].length / 2 - 1] = 0;
+                } else {
+                    for (int x = pAfter.x; x > BOARD[0].length / 2; x--) {
+                        BOARD[pAfter.y][x] = BOARD[pAfter.y][x - 1];
+                    }
+                    BOARD[pAfter.y][BOARD[0].length / 2] = 0;
+                }
+            }
+            case 7: {
+                Point pBefore = p1;
+                Point pAfter = p2;
+
+                int middleX = BOARD[0].length / 2;
+                int distancep1 = Math.abs(p1.x - middleX);
+                int distancep2 = Math.abs(p2.x - middleX);
+                if (distancep2 > distancep1) {
+                    pBefore = p2;
+                    pAfter = p1;
+                }
+                if (pBefore.x < BOARD[0].length / 2) {
+                    for (int x = pBefore.x; x > 0; x--) {
+                        BOARD[pBefore.y][x] = BOARD[pBefore.y][x -1];
+                    }
+                    BOARD[pBefore.y][0] = 0;
+                } else {
+                    for (int x = pBefore.x; x < BOARD[0].length - 1; x++) {
+                        BOARD[pBefore.y][x] = BOARD[pBefore.y][x + 1];
+                    }
+                    BOARD[pBefore.y][BOARD[0].length - 1] = 0;
+                }
+                if (pAfter.x < BOARD[0].length / 2) {
+                    for (int x = pAfter.x; x > 0; x--) {
+                        BOARD[pAfter.y][x] = BOARD[pAfter.y][x -1];
+                    }
+                    BOARD[pAfter.y][0] = 0;
+                } else {
+                    for (int x = pAfter.x; x < BOARD[0].length - 1; x++) {
+                        BOARD[pAfter.y][x] = BOARD[pAfter.y][x + 1];
+                    }
+                    BOARD[pAfter.y][BOARD[0].length - 1] = 0;
+                }
             }
             default:
                 break;

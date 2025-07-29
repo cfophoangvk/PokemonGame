@@ -259,8 +259,9 @@ public class MainActivity extends AppCompatActivity {
                 p1 = new Point(x1, y1);
                 p2 = new Point(x2, y2);
             }
-            boolean canConnect = GameManager.canTwoPointsConnected(p1, p2);
 
+            //if two selected cards are connected, draw line and remove card.
+            boolean canConnect = GameManager.canTwoPointsConnected(p1, p2);
             if (canConnect) {
                 PointPair pp = new PointPair(p1, p2);
                 PointPair ppMiddleLine = GameManager.validPairs.get(pp);
@@ -268,61 +269,64 @@ public class MainActivity extends AppCompatActivity {
                 GameManager.removeCard(p1, p2);
             }
 
-            //after the line + highlight cards are rendered, waits for 0.1 seconds and then remove the highlighted color + the draw line from the 2 selected cards.
             card.postDelayed(() -> {
+                //remove the highlighted color and the draw line
                 if (pairingImageView != null) pairingImageView.setForeground(null);
                 card.setForeground(null);
                 drawLine(null, null, null);
                 pairingImageView = null;
 
-                if (canConnect) {
-                    //sync images to board after board matrix is changed
-                    synchronizeBoard();
-                    //check if all board are empty -> you win
-                    if (GameManager.checkEmptyBoard()) {
-                        countDownTimer.cancel();
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-                                .setTitle(getString(R.string.you_win))
-                                .setMessage(getString(R.string.next_level))
-                                .setPositiveButton(getString(R.string.continue_game), (di, which) -> {
-                                    Intent intent = new Intent(this, getClass());
-                                    intent.putExtra("hint", hintRemaining);
-                                    intent.putExtra("shuffle", ++shuffleRemaining);
-                                    finish();
-                                    startActivity(intent);
-                                })
-                                .setNegativeButton(getString(R.string.quit), (di, which) -> {
-                                    finish();
-                                });
-                        builder.setCancelable(false);
-                        builder.show();
-                    } else {
-                        if (GameManager.validPairs.isEmpty()) {
-                            //if shuffle is remaining
-                            if (shuffleRemaining > 0) {
-                                shuffleBtn.performClick();
-                            } else {
-                                //if no more moves + no shuffle -> you lose
-                                countDownTimer.cancel();
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle(getString(R.string.game_over))
-                                        .setMessage(getString(R.string.no_more_moves))
-                                        .setPositiveButton(getString(R.string.play_again), (di, which) -> {
-                                            Intent intent = new Intent(this, getClass());
-                                            intent.putExtra("hint", 3);
-                                            intent.putExtra("shuffle", 3);
-                                            finish();
-                                            startActivity(intent);
-                                        })
-                                        .setNegativeButton(getString(R.string.quit), (di, which) -> {
-                                            finish();
-                                        });
-                                builder.setCancelable(false);
-                                builder.show();
-                            }
+                if (!canConnect) {
+                    return;
+                }
+
+                //sync images to board after board matrix is changed
+                synchronizeBoard();
+                //check if all board are empty -> you win
+                if (GameManager.checkEmptyBoard()) {
+                    countDownTimer.cancel();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(getString(R.string.you_win))
+                            .setMessage(getString(R.string.next_level))
+                            .setPositiveButton(getString(R.string.continue_game), (di, which) -> {
+                                Intent intent = new Intent(this, getClass());
+                                intent.putExtra("hint", hintRemaining);
+                                intent.putExtra("shuffle", ++shuffleRemaining);
+                                finish();
+                                startActivity(intent);
+                            })
+                            .setNegativeButton(getString(R.string.quit), (di, which) -> {
+                                finish();
+                            });
+                    builder.setCancelable(false);
+                    builder.show();
+                } else {
+                    //if there isn't any available move
+                    if (GameManager.validPairs.isEmpty()) {
+                        //if shuffle is remaining
+                        if (shuffleRemaining > 0) {
+                            shuffleBtn.performClick();
                         } else {
-                            populateCardsAgain(false); //make sure there is always a valid move
+                            //if no more moves + no shuffle -> you lose
+                            countDownTimer.cancel();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle(getString(R.string.game_over))
+                                    .setMessage(getString(R.string.no_more_moves))
+                                    .setPositiveButton(getString(R.string.play_again), (di, which) -> {
+                                        Intent intent = new Intent(this, getClass());
+                                        intent.putExtra("hint", 3);
+                                        intent.putExtra("shuffle", 3);
+                                        finish();
+                                        startActivity(intent);
+                                    })
+                                    .setNegativeButton(getString(R.string.quit), (di, which) -> {
+                                        finish();
+                                    });
+                            builder.setCancelable(false);
+                            builder.show();
                         }
+                    } else {
+                        populateCardsAgain(false);
                     }
                 }
             }, 100);
